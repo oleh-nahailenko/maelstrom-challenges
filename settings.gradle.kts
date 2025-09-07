@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "flyio-maelstrom-challenges"
-include("common", "echo")
+include("common", "echo", "unique-id")
