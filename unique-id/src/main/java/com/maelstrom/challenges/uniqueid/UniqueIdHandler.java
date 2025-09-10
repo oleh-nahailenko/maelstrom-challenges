@@ -1,7 +1,5 @@
 package com.maelstrom.challenges.uniqueid;
 
-import java.util.UUID;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,6 +11,8 @@ import com.maelstrom.challenges.common.Handler;
 public class UniqueIdHandler implements Handler {
 
     private final ObjectMapper mapper;
+
+    private SpacefakeIdGenerator idGenerator;
     private String nodeId;
 
     public UniqueIdHandler(ObjectMapper mapper) {
@@ -28,13 +28,16 @@ public class UniqueIdHandler implements Handler {
         case "init" -> {
           nodeId = messageBody.get("node_id").asText();
 
+          int nodeNumber = Integer.parseInt(nodeId.substring(1));
+          idGenerator = new SpacefakeIdGenerator(nodeNumber);
+
           ObjectNode initReplyBody = mapper.createObjectNode();
           initReplyBody.put("type", "init_ok");
           initReplyBody.set("in_reply_to", messageBody.get("msg_id"));
           yield initReplyBody;
         }
         case "generate" -> {
-          String uniqueId = UUID.randomUUID().toString();
+          long uniqueId = idGenerator.nextId();
 
           ObjectNode generateReplyBody = mapper.createObjectNode();
           generateReplyBody.put("type", "generate_ok");
